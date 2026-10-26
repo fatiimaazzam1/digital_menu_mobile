@@ -55,6 +55,19 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '${results.length} items',
+                key: const Key('search-result-count'),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: const Color(0xFF73788A)),
+              ),
+            ),
+          ),
           Expanded(
             child: results.isEmpty
                 ? const Center(child: Text('No menu items match your search.'))

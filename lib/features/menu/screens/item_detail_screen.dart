@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/menu_repository.dart';
+import '../widgets/menu_item_image.dart';
 
 class ItemDetailScreen extends StatelessWidget {
   const ItemDetailScreen({
@@ -15,6 +16,15 @@ class ItemDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final item = repository.itemById(itemId);
+    String? categoryName;
+    if (item != null) {
+      for (final category in repository.categories) {
+        if (category.id == item.categoryId) {
+          categoryName = category.name;
+          break;
+        }
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text(item?.name ?? 'Item Details')),
@@ -23,27 +33,19 @@ class ItemDetailScreen extends StatelessWidget {
           : ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                Container(
-                  height: 180,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    item.imageAssetPath == null
-                        ? 'Image pending verified menu assets'
-                        : 'Image: ${item.imageAssetPath}',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                MenuItemImage(item: item, height: 240),
                 const SizedBox(height: 20),
                 Text(
                   item.name,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
+                if (categoryName != null) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Chip(label: Text(categoryName)),
+                  ),
+                ],
                 const SizedBox(height: 8),
                 Text('\$${item.priceUsd.toStringAsFixed(2)} USD'),
                 const SizedBox(height: 16),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:digital_menu_mobile/features/menu/data/menu_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,9 +10,38 @@ void main() {
     expect(repository.items, hasLength(12));
     expect(repository.categories, hasLength(4));
     expect(repository.items.map((item) => item.id).toSet(), hasLength(12));
+    expect(repository.categories.map((category) => category.id).toSet(), {
+      'drinks',
+      'starters',
+      'mains',
+      'desserts',
+    });
+    expect(repository.categories.map((category) => category.name).toSet(), {
+      'Drinks',
+      'Starters',
+      'Mains',
+      'Desserts',
+    });
+    expect(
+      repository.items.map((item) => item.imageAssetPath).toSet(),
+      hasLength(12),
+    );
 
     for (final category in repository.categories) {
       expect(repository.itemsForCategory(category.id), hasLength(3));
+    }
+  });
+
+  test('sample records have required values and bundled image files', () {
+    for (final item in repository.items) {
+      expect(item.id.trim(), isNotEmpty);
+      expect(item.categoryId.trim(), isNotEmpty);
+      expect(item.name.trim(), isNotEmpty);
+      expect(item.description.trim(), isNotEmpty);
+      expect(item.displayNote.trim(), isNotEmpty);
+      expect(item.priceUsd, greaterThan(0));
+      expect(item.imageAssetPath, startsWith('assets/images/menu/'));
+      expect(File(item.imageAssetPath).existsSync(), isTrue);
     }
   });
 

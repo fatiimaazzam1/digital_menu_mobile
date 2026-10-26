@@ -16,6 +16,5 @@ class MenuItem {
   final String displayNote;
   final double priceUsd;
 
-  /// Null until a verified, bundled menu image is available.
-  final String? imageAssetPath;
+  final String imageAssetPath;
 }

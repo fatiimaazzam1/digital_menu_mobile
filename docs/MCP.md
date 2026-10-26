@@ -24,7 +24,7 @@ The CSS attachment and approved design documentation establish the following vis
 - **Screens and navigation:** The approved product/design documents describe Home, Search, Orders, and Profile navigation, category browsing, All Items, item details, and a QR scanner. The CSS attachment indicates styling for menu, search, scanner, and navigation elements; exact source component structure and interactions were not verified from `src/App.tsx`.
 - **Web-prototype constraints:** The reviewed CSS evidence describes a centered shell capped at about 390 px, a minimum height around 844 px, fixed-height regions, and breakpoints near 420 px and 365 px. These web layout constraints are not appropriate as fixed Flutter screen dimensions; the mobile UI must adapt to available constraints, safe areas, scrolling, and text scaling.
 
-No actual menu image files were retrieved or verified. CSS image URL references are not proof that the files exist, are approved, or are licensed for use. Do not treat CSS font imports as retrieved font assets.
+No actual menu image files were retrieved or verified from the Figma Make project. CSS image URL references are not proof that the files exist, are approved, or are licensed for use. Separately, the core implementation later bundled Commons-sourced sample photos; their provenance is recorded in [MVP.md](./MVP.md), and they are not Figma assets. Do not treat CSS font imports as retrieved font assets.
 
 ## Relationship to `DESIGN.md`
 
@@ -32,4 +32,4 @@ No actual menu image files were retrieved or verified. CSS image URL references 
 
 ## Conclusion and pending verification
 
-Figma MCP authentication was verified in this session, and the previously reviewed CSS attachment provides useful ARDO visual guidance. Direct Make source inspection, menu-image verification and provenance, and local font availability remain pending. Flutter implementation should proceed from the approved PRD and DESIGN documents, with unresolved assets verified before they are bundled.
+Figma MCP authentication was verified in this session, and the previously reviewed CSS attachment provides useful ARDO visual guidance. Direct Make source inspection, verification/provenance of Figma's own images, and local font availability remain pending. Flutter implementation should proceed from the approved PRD and DESIGN documents, and distinguish any separate sample assets from approved Figma content.

@@ -8,7 +8,7 @@ const sampleMenuCategories = [
   MenuCategory(id: 'desserts', name: 'Desserts'),
 ];
 
-// Provisional POC fixtures only; these records are not verified Figma content.
+// Local sample-menu content; these records are not sourced from ARDO/Figma.
 const sampleMenuItems = [
   MenuItem(
     id: 'drink-citrus-sparkler',
@@ -17,7 +17,7 @@ const sampleMenuItems = [
     description: 'Fresh citrus with sparkling water and a hint of mint.',
     displayNote: 'Bright and refreshing',
     priceUsd: 5.50,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/drink-citrus-sparkler.jpg',
   ),
   MenuItem(
     id: 'drink-iced-coffee',
@@ -26,7 +26,7 @@ const sampleMenuItems = [
     description: 'Chilled house coffee served over ice.',
     displayNote: 'Smooth, slow-brewed coffee',
     priceUsd: 4.75,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/drink-iced-coffee.jpg',
   ),
   MenuItem(
     id: 'drink-berry-lemonade',
@@ -35,7 +35,7 @@ const sampleMenuItems = [
     description: 'Lemonade blended with seasonal berries.',
     displayNote: 'House-made lemonade',
     priceUsd: 5.25,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/drink-berry-lemonade.jpg',
   ),
   MenuItem(
     id: 'starter-burrata',
@@ -44,7 +44,7 @@ const sampleMenuItems = [
     description: 'Creamy burrata with tomatoes, herbs, and toasted bread.',
     displayNote: 'Served with warm toast',
     priceUsd: 12.00,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/starter-burrata.jpg',
   ),
   MenuItem(
     id: 'starter-roasted-carrots',
@@ -53,7 +53,7 @@ const sampleMenuItems = [
     description: 'Slow-roasted carrots with yogurt and toasted seeds.',
     displayNote: 'A seasonal favorite',
     priceUsd: 9.50,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/starter-roasted-carrots.jpg',
   ),
   MenuItem(
     id: 'starter-crispy-calamari',
@@ -62,7 +62,7 @@ const sampleMenuItems = [
     description: 'Lightly crisp calamari with lemon and herb aioli.',
     displayNote: 'Lemon herb aioli',
     priceUsd: 13.00,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/starter-crispy-calamari.jpg',
   ),
   MenuItem(
     id: 'main-duck-breast',
@@ -71,7 +71,7 @@ const sampleMenuItems = [
     description: 'Seared duck breast with seasonal vegetables.',
     displayNote: 'Finished with a savory pan sauce',
     priceUsd: 28.00,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/main-duck-breast.jpg',
   ),
   MenuItem(
     id: 'main-mushroom-risotto',
@@ -80,7 +80,7 @@ const sampleMenuItems = [
     description: 'Creamy rice with roasted mushrooms and parmesan.',
     displayNote: 'Made to order',
     priceUsd: 21.00,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/main-mushroom-risotto.jpg',
   ),
   MenuItem(
     id: 'main-grilled-salmon',
@@ -89,7 +89,7 @@ const sampleMenuItems = [
     description: 'Grilled salmon with greens and lemon dressing.',
     displayNote: 'Served with market greens',
     priceUsd: 25.00,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/main-grilled-salmon.jpg',
   ),
   MenuItem(
     id: 'dessert-chocolate-tart',
@@ -98,7 +98,7 @@ const sampleMenuItems = [
     description: 'Dark chocolate tart with a delicate crisp pastry shell.',
     displayNote: 'Rich dark chocolate',
     priceUsd: 9.00,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/dessert-chocolate-tart.jpg',
   ),
   MenuItem(
     id: 'dessert-lemon-panna-cotta',
@@ -107,7 +107,7 @@ const sampleMenuItems = [
     description: 'Silky panna cotta with lemon and fresh fruit.',
     displayNote: 'Light and gently citrusy',
     priceUsd: 8.50,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/dessert-lemon-panna-cotta.jpg',
   ),
   MenuItem(
     id: 'dessert-apple-crumble',
@@ -116,6 +116,6 @@ const sampleMenuItems = [
     description: 'Warm spiced apples with a crisp oat topping.',
     displayNote: 'Best served warm',
     priceUsd: 8.75,
-    imageAssetPath: null,
+    imageAssetPath: 'assets/images/menu/dessert-apple-crumble.jpg',
   ),
 ];
