@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/design_tokens.dart';
 import '../data/menu_item.dart';
 
 class MenuItemImage extends StatelessWidget {
@@ -19,7 +20,7 @@ class MenuItemImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppRadii.image),
       child: Image.asset(
         item.imageAssetPath,
         width: width,

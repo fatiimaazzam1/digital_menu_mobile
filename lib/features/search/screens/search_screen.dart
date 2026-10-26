@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/design_tokens.dart';
 import '../../menu/data/menu_repository.dart';
 import '../../menu/screens/item_detail_screen.dart';
 import '../../menu/widgets/menu_item_card.dart';
@@ -32,7 +33,7 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.contentInset),
             child: TextField(
               key: const Key('menu-search-field'),
               controller: _queryController,
@@ -51,12 +52,19 @@ class _SearchScreenState extends State<SearchScreen> {
                         },
                         icon: const Icon(Icons.clear),
                       ),
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadii.surface),
+                ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.contentInset,
+              0,
+              AppSpacing.contentInset,
+              AppSpacing.compact,
+            ),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -72,7 +80,9 @@ class _SearchScreenState extends State<SearchScreen> {
             child: results.isEmpty
                 ? const Center(child: Text('No menu items match your search.'))
                 : ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.contentInset,
+                    ),
                     children: [
                       for (final item in results)
                         MenuItemCard(

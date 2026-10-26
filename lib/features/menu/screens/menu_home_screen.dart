@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/design_tokens.dart';
+import '../data/menu_item.dart';
 import '../data/menu_repository.dart';
 import '../widgets/menu_item_card.dart';
 import 'all_items_screen.dart';
 import 'item_detail_screen.dart';
+import '../../qr_scanner/screens/qr_scanner_screen.dart';
 
 class MenuHomeScreen extends StatefulWidget {
   const MenuHomeScreen({
     required this.repository,
     required this.onSearchTap,
+    this.scannerPreviewBuilder,
     super.key,
   });
 
   final MenuRepository repository;
   final VoidCallback onSearchTap;
+  final QrScannerPreviewBuilder? scannerPreviewBuilder;
 
   @override
   State<MenuHomeScreen> createState() => _MenuHomeScreenState();
@@ -30,28 +35,62 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final largeText = MediaQuery.textScalerOf(context).scale(14) >= 18;
     final crossAxisCount = screenWidth >= 340 && !largeText ? 2 : 1;
+    final menuItems = crossAxisCount == 1
+        ? SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final item = visibleItems[index];
+              return _menuItemCard(context, item, isGrid: false);
+            }, childCount: visibleItems.length),
+          )
+        : SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: AppSpacing.controlGap,
+              mainAxisSpacing: AppSpacing.controlGap,
+              childAspectRatio: 0.62,
+            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final item = visibleItems[index];
+              return _menuItemCard(context, item, isGrid: true);
+            }, childCount: visibleItems.length),
+          );
 
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 72,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+        title: Row(
           children: [
-            Text(
-              'ARDO',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: const Color(0xFFFFFDF8),
-                fontWeight: FontWeight.w700,
-                letterSpacing: 2,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                key: const Key('ardo-menu-logo'),
+                'assets/branding/ardo_menu_icon.png',
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
               ),
             ),
-            Text(
-              'DIGITAL MENU',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: const Color(0xFFE5CF9D),
-                letterSpacing: 1.6,
-              ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'ARDO',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: const Color(0xFFFFFDF8),
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2,
+                  ),
+                ),
+                Text(
+                  'MENU',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: const Color(0xFFE5CF9D),
+                    letterSpacing: 1.6,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -59,17 +98,22 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
       body: CustomScrollView(
         slivers: [
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.contentInset,
+              20,
+              AppSpacing.contentInset,
+              0,
+            ),
             sliver: SliverToBoxAdapter(
               child: Semantics(
                 button: true,
                 label: 'Search the menu',
                 child: Material(
                   color: const Color(0xFFFFFDF8),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(AppRadii.surface),
                   child: InkWell(
                     key: const Key('home-search-shortcut'),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(AppRadii.surface),
                     onTap: widget.onSearchTap,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -77,7 +121,7 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
                         vertical: 15,
                       ),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(AppRadii.surface),
                         border: Border.all(color: const Color(0xFFE6E0D5)),
                       ),
                       child: const Row(
@@ -90,10 +134,7 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
                               style: TextStyle(color: Color(0xFF73788A)),
                             ),
                           ),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Color(0xFF1D3764),
-                          ),
+                          Icon(Icons.arrow_forward, color: Color(0xFF1D3764)),
                         ],
                       ),
                     ),
@@ -103,7 +144,12 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.contentInset,
+              AppSpacing.section,
+              AppSpacing.contentInset,
+              0,
+            ),
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
@@ -132,48 +178,61 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 112,
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                children: [
-                  for (final category in widget.repository.categories)
-                    _categoryButton(
-                      label: category.name,
-                      categoryId: category.id,
-                      isSelected: _selectedCategoryId == category.id,
-                    ),
-                ],
-              ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.contentInset,
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12,
-                runSpacing: 4,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: null,
-                    icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text('Scan Menu QR'),
-                  ),
-                  Text(
-                    'Scanner is not included in this core build.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: const Color(0xFF73788A),
-                    ),
-                  ),
-                ],
+            sliver: SliverToBoxAdapter(
+              child: SizedBox(
+                height: 112,
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    for (final category in widget.repository.categories)
+                      _categoryButton(
+                        label: category.name,
+                        categoryId: category.id,
+                        isSelected: _selectedCategoryId == category.id,
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.contentInset,
+              AppSpacing.controlGap,
+              AppSpacing.contentInset,
+              AppSpacing.compact,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  key: const Key('open-qr-scanner'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    alignment: Alignment.centerLeft,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadii.surface),
+                    ),
+                  ),
+                  onPressed: () => _openQrScanner(context),
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Scan Menu QR'),
+                ),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.contentInset,
+              AppSpacing.controlGap,
+              AppSpacing.contentInset,
+              AppSpacing.compact,
+            ),
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
@@ -204,26 +263,13 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: crossAxisCount == 1 ? 1.15 : 0.62,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final item = visibleItems[index];
-                  return MenuItemCard(
-                    item: item,
-                    isGrid: crossAxisCount > 1,
-                    onTap: () => _openItemDetails(context, item.id),
-                  );
-                },
-                childCount: visibleItems.length,
-              ),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.contentInset,
+              0,
+              AppSpacing.contentInset,
+              28,
             ),
+            sliver: menuItems,
           ),
         ],
       ),
@@ -298,11 +344,41 @@ class _MenuHomeScreenState extends State<MenuHomeScreen> {
     );
   }
 
+  Widget _menuItemCard(
+    BuildContext context,
+    MenuItem item, {
+    required bool isGrid,
+  }) {
+    return MenuItemCard(
+      item: item,
+      isGrid: isGrid,
+      onTap: () => _openItemDetails(context, item.id),
+    );
+  }
+
   void _openItemDetails(BuildContext context, String itemId) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) =>
             ItemDetailScreen(repository: widget.repository, itemId: itemId),
+      ),
+    );
+  }
+
+  Future<void> _openQrScanner(BuildContext context) async {
+    final recognized = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) =>
+            QrScannerScreen(previewBuilder: widget.scannerPreviewBuilder),
+      ),
+    );
+
+    if (!context.mounted || recognized != true) {
+      return;
+    }
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => AllItemsScreen(repository: widget.repository),
       ),
     );
   }

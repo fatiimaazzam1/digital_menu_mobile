@@ -1,92 +1,159 @@
-# QA and Verification Record
+# Quality Assurance (QA)
 
-## 1. Environment and Evidence
+## 1. Purpose
 
-- **Flutter:** 3.41.5
-- **Dart:** 3.11.3
-- **Branch:** `feat/menu-mvp`
-- **Project scope:** Core digital menu MVP. QR scanning is not implemented on this branch.
+This document records automated verification and manual testing of the Digital Menu Mobile Application. It separates automated test results, physical Android device testing, and checks that remain unverified.
 
-### Automated Verification
+## 2. Test Environment
 
-The following results were recorded during the current core MVP verification. Rerun the commands after further implementation changes to confirm the latest state.
+| Item | Details |
+|---|---|
+| Project | Digital Menu Mobile Application |
+| Current branch | `feat/qr-scanner` |
+| Framework | Flutter |
+| Flutter version | 3.41.5 |
+| Dart version | 3.11.3 |
+| Tested physical platform | Android |
+| Physical device testing | Completed and reported by the developer |
+| iOS testing | Not tested |
+| Backend | Not used; menu data is local |
+| Network dependency for menu data | None |
 
-| Check | Recorded result | Evidence and limitations |
+The Android device model, Android OS version, and exact device-test date were not recorded in this document.
+
+## 3. Automated Verification
+
+The following results were recorded for the current implementation on 2026-10-26.
+
+| Check | Result | Recorded details |
 |---|---|---|
-| `flutter test` | PASS — 17 tests passed | 8 repository/unit tests and 9 widget tests were reported. |
-| `flutter analyze` | PASS — No issues found | The analyzer reported no issues during the recorded run. |
-| `flutter build apk --release` | PASS — Previous recorded run | The release APK was reported as successfully generated at `build/app/outputs/flutter-apk/app-release.apk`, with a size of 47.7 MB. The build was not rerun during the latest read-only audit. |
-| `git diff --check` | Earlier run: PASS with a line-ending warning. Latest final verification: PASS with no output. | Both runs returned exit code 0. The earlier `pubspec.lock` line-ending warning is historical and is not an application test result. |
+| `flutter pub get` | PASS | Dependencies resolved |
+| `dart format --output=none --set-exit-if-changed lib test` | PASS | 18 files checked; no formatting changes required |
+| `flutter analyze` | PASS | No issues reported |
+| `flutter test` | PASS | 28 tests passed: 8 repository, 5 QR parser, and 15 widget tests |
+| `git diff --check` | PASS | No whitespace errors reported |
+| `flutter build apk --debug` | PASS | Debug APK generated at `build/app/outputs/flutter-apk/app-debug.apk` |
 
-Widget tests include a 360 logical-pixel layout and a larger text-scaling case. These are automated layout checks, not physical-device accessibility certification.
+These are recorded results from the previous verification run. Run the commands again after any subsequent changes before submitting.
 
-### Device and Platform Limitations
+## 4. Physical Android Device Testing
 
-- An Android emulator was discovered, but the attempted Pixel 7 Pro emulator remained offline as `emulator-5554`. No usable Android device or emulator was available in `flutter devices` during the recorded attempt.
-- The current core build has therefore not been fully tested on a physical Android device.
-- This Windows environment cannot perform native iOS builds with Xcode. No iOS build or runtime test was performed.
-- The earlier physical Android Search observations for queries `el` and `cr` are documented in [POC.md](POC.md). These are historical proof-of-concept observations, not verification of the current MVP build.
-- Automated tests check menu data, image paths, and file existence. They do not establish that every image is visually appropriate, correctly licensed, or rendered correctly on a physical device.
+**Status: MANUAL TESTING COMPLETED — developer-reported.**
 
-## 2. Acceptance-Criteria Status
+The developer confirmed that the application was run and tested on a real Android device. The following scenarios were tested:
 
-Statuses below describe the available evidence for the current `feat/menu-mvp` branch.
+- [x] Opened and ran the application on a physical Android device.
+- [x] Checked the Home screen and category browsing.
+- [x] Checked All Items and item details.
+- [x] Tested Search and navigation.
+- [x] Opened the QR scanner and scanned a real QR code.
+- [x] Continued from the successful scan to All Items.
+- [x] Checked navigation back to Home.
+- [x] Tested camera permission grant and denial.
+- [x] Tested the application with airplane mode enabled.
+- [x] Checked the user interface and layout on the physical device.
+- [ ] Tested the application on an iOS device.
 
-- **PASS:** The specified behavior is supported by the recorded automated tests and/or code inspection. This does not automatically imply physical-device verification.
-- **PARTIAL:** Some implementation or automated evidence exists, but additional verification or part of the expected scope remains incomplete.
-- **FAIL:** The current implementation is known not to satisfy the criterion.
-- **NOT VERIFIED:** Adequate evidence is not available to determine whether the criterion is satisfied.
+This manual testing is recorded as developer-reported physical-device verification. The device model, OS version, screenshots or video evidence, and exact test date were not recorded here. That documentation limitation does **not** mean the Android device tests were never performed.
 
-| Criterion | Status | Evidence and remaining limitation |
-|---|---|---|
-| AC-01 — Usable Menu Home | PARTIAL | Home and its controls render in widget tests. Physical Android usability has not been verified. |
-| AC-02 — Readable categories | PARTIAL | Four category labels are present and covered by the recorded widget checks. Physical-device readability and contrast have not been evaluated. |
-| AC-03 — In-place category filtering | PASS | Repository and widget tests verify category filtering without navigating away from Home. |
-| AC-04 — All 12 items | PASS | Repository tests verify 12 unique records and three items per category. The All Items screen uses the repository data grouped by category. |
-| AC-05 — Correct details and image | PARTIAL | Required item data and image-file existence are checked. The detail screen displays the selected item's image and content, with a missing-image fallback. Visual image correctness and all item-image pairings have not been verified end-to-end. |
-| AC-06 — Distinct item details | PASS | Recorded widget tests open Duck Breast and Mushroom Risotto details and verify their matching content and prices. |
-| AC-07 — Back to browsing | PASS | Widget tests verify returning from item details to All Items and Search. |
-| AC-08 — Offline menu | PARTIAL | Menu data and image assets are local, and the inspected core code has no runtime network dependency for menu browsing. Airplane-mode behavior has not been tested on a device. |
-| AC-09 — Responsive/device readability | PARTIAL | Widget tests check a 360 logical-pixel layout and enlarged text without framework exceptions. Wider-device layouts, physical safe areas, and assistive-technology behavior remain unverified. |
-| AC-10 — Notice-only Orders/Profile | PASS | Four-tab navigation and the notice are implemented. Orders and Profile do not provide real feature pages or business actions. |
-| AC-11 — Controls work as labelled | PARTIAL | Core browsing, Search, and tab interactions are covered by tests. The Scan Menu QR control is intentionally disabled on this branch because the scanner has not been implemented. |
-| AC-12 — Android release install/flow | PARTIAL | A previous release APK build succeeded. Installation and application flows have not been tested on a usable Android device or emulator. |
-| AC-13 — Android/iOS targets | PARTIAL | Android and iOS project folders exist, and Android release packaging was reported successful. Native iOS build and runtime behavior remain unverified. |
-| AC-14 — Open camera QR scanner | FAIL | The current branch contains a disabled integration point. No camera scanner is implemented. |
-| AC-15 — Valid QR opens local menu | FAIL | QR payload handling is not implemented. |
-| AC-16 — Invalid QR handling | FAIL | Invalid QR payload handling is not implemented. |
-| AC-17 — Camera denial/unavailability | FAIL | Camera permission and unavailable-camera flows are not implemented. |
-| AC-18 — Prevent duplicate scan navigation | FAIL | No scanner callback or scanner lifecycle is implemented. |
-| AC-19 — Runnable source and essential documentation | PASS | README setup instructions and project documentation are present. A clean setup on another machine has not been independently verified. |
-| AC-20 — Local device demonstration | NOT VERIFIED | No current-build physical-device demonstration was completed during the recorded verification. |
-| AC-21 — No secrets/private configuration | NOT VERIFIED | No credential was intentionally added according to the implementation record, but a complete repository secrets audit has not been performed. |
-| AC-22 — Four-tab navigation and back context | PASS | Home, Search, Orders, and Profile are present. Tests cover notice dismissal, restoration of the functional tab, and pushed-screen back behavior. |
-| AC-23 — Local Search | PARTIAL | Unit/widget tests cover matching fields, case-insensitivity, whitespace trimming, empty and cleared queries, no-results behavior, and navigation to item details. The repository uses local data. Physical-device Search and airplane-mode behavior remain unverified. |
-| AC-24 — Orders/Profile notice only | PASS | Widget tests verify the exact notice and that dismissing it returns to Home or Search without changing the functional tab. |
+### Scope of the physical-device result
 
-**Important:** AC-14 through AC-18 describe the QR feature expected by the requirements. Their FAIL statuses apply to the current core branch; they do not mean the QR feature has been tested and found defective. It has not yet been implemented here.
+The physical Android tests support the tested user flows on the device used. They do not, by themselves, establish that every Android model, screen size, OS version, or release build behaves identically.
 
-## 3. Manual Test Record
+The airplane-mode test supports the local-data/offline behavior observed during that test. iOS behavior remains unverified.
 
-| Platform/device | Flow | Result |
-|---|---|---|
-| Current Android device | Current core build, menu browsing, image rendering, offline mode, Search, and four-tab navigation | NOT RUN — no usable Android device or emulator was detected during the recorded attempt. |
-| Android release package | `flutter build apk --release` | PASS — previous recorded build succeeded; installation and runtime were not tested. |
-| iOS device/simulator | Native build and runtime | NOT RUN — macOS/Xcode unavailable in the recorded environment. |
-| Historical Android POC | Search queries `el` and `cr` | LIMITED HISTORICAL OBSERVATION — details are recorded in [POC.md](POC.md). This is not current-MVP acceptance evidence. |
+## 5. Automated QR Scanner Coverage
 
-No physical-device test should be marked PASS until the current build has actually been installed and the relevant flows have been exercised.
+The automated tests cover the following scanner behaviors:
 
-## 4. Next Verification Steps
+- Parsing and accepting the expected payload `digital-menu:sample-01`.
+- Rejecting unsupported QR payloads rather than opening arbitrary URLs.
+- Requiring three matching detections within the configured 700 ms stability window.
+- Resetting recognition when the required detection sequence is interrupted.
+- Preventing duplicate navigation after a successful scan.
+- Showing successful recognition feedback.
+- Continuing to the existing All Items screen.
+- Returning to Home using the back-navigation flow.
+- Handling late scanner callbacks.
+- Handling permission-denied and unavailable-camera states.
 
-1. **Android device verification:** Connect a physical Android phone or bring an emulator fully online. Confirm it appears in `flutter devices`, install the current build, and test Home, category filtering, All Items, item details and back navigation, Search and clear, Orders/Profile notices, and image rendering.
-2. **Offline verification:** Enable airplane mode on the test device and repeat menu browsing, image display, and Search. Record the actual result.
-3. **QR implementation:** Implement the scanner on the explicitly approved QR branch. Test valid payloads, invalid payloads, camera permission denial, unavailable-camera handling, and duplicate-scan navigation. Update AC-14 through AC-18 only after obtaining implementation and test evidence.
-4. **iOS verification:** If macOS/Xcode becomes available, build and run the app on an iOS simulator or device and record the results.
-5. **Secrets audit:** Inspect tracked files and relevant repository history for accidentally committed credentials or private configuration. Record the audit method and result.
-6. **Final automated verification:** After any source or test changes, rerun `flutter test`, `flutter analyze`, and `git diff --check`. Rerun `flutter build apk --release` when validating the current Android release package.
-7. **Documentation alignment:** Update this QA record and the relevant README, MVP, and REVIEW sections whenever implementation or verification status changes. Keep `docs/PRD.md` unchanged unless a requirements change is explicitly approved.
+Automated widget/parser tests complement the physical-device tests; they are not a replacement for testing native camera behavior on each platform.
 
----
+## 6. Layout and Usability Coverage
 
-**Current assessment:** The core MVP has recorded passing automated checks, but physical-device verification remains outstanding and the QR scanner is not implemented on `feat/menu-mvp`. The complete challenge must not be reported as fully verified until its remaining required implementation and verification work is completed.
+Automated layout tests cover:
+
+- Home and Search screen alignment and corner radii.
+- Grid, card, and price alignment.
+- Horizontal content insets.
+- Image bounds.
+- Long text and price rendering.
+- A narrow width of 320 logical pixels.
+- Larger text settings.
+
+The developer also confirmed that the UI was checked on a physical Android device. This does not establish visual compatibility across every device size or accessibility setting.
+
+## 7. Acceptance Criteria Traceability
+
+Status definitions:
+
+- **PASS:** The criterion has supporting automated or manual verification for the tested scope.
+- **PARTIAL:** Some relevant behavior was verified, but the full criterion has not been established.
+- **NOT VERIFIED:** No sufficient verification result is recorded for that criterion.
+
+| Criterion | Area | Status | Notes |
+|---|---|---|---|
+| AC-01 | Menu Home | PASS | Home screen checked on a physical Android device and covered by automated tests. |
+| AC-02 | Category browsing | PASS | Categories checked on a physical Android device. |
+| AC-03 | Category filtering | PASS | Filtering covered by automated tests. |
+| AC-04 | All Items | PASS | All Items screen checked on a physical Android device; automated coverage recorded. |
+| AC-05 | Item details and images | PARTIAL | Item details and UI were checked; complete verification of every image-to-item pairing is not separately recorded. |
+| AC-06 | Distinct item details | PASS | Detail behavior covered by automated tests. |
+| AC-07 | Back navigation | PASS | Back navigation checked on the physical Android device and covered by tests. |
+| AC-08 | Offline menu behavior | PASS | Airplane-mode behavior tested on the physical Android device. |
+| AC-09 | Responsive layout and readability | PARTIAL | UI checked on the tested Android device and automated narrow-width/text tests exist; not all device sizes are covered. |
+| AC-10 | Orders/Profile placeholder | PASS | Placeholder behavior covered by automated tests. |
+| AC-11 | User controls and navigation | PASS | Core navigation and tested interactions checked on the physical Android device and/or automated tests. |
+| AC-12 | Android release build and release-flow validation | NOT VERIFIED | A debug APK build passed. A release APK installation and release-flow test are not recorded. |
+| AC-13 | Android and iOS compatibility | PARTIAL | Android physical-device testing completed; iOS has not been tested. |
+| AC-14 | Open QR scanner and use camera | PASS | Scanner opened and a real QR code was scanned on a physical Android device. |
+| AC-15 | Recognize valid QR and open local menu | PASS | Successful scan, Continue, All Items, and return to Home were tested on the physical Android device. |
+| AC-16 | Reject invalid QR content | PARTIAL | Automated parser/rejection coverage exists; a physical-device invalid-QR test is not separately confirmed. |
+| AC-17 | Camera permission and unavailable-camera recovery | PARTIAL | Camera permission grant/denial was tested on Android. Unavailable-camera behavior is covered by automated tests; separate physical-device verification is not recorded. |
+| AC-18 | Duplicate-scan navigation protection | PARTIAL | Automated coverage exists; a dedicated physical-device duplicate-scan test is not separately recorded. |
+| AC-19 | Source code and documentation are available | PARTIAL | Project files and documentation are maintained in the repository; final submission readiness must be checked after the final changes. |
+| AC-20 | Local device demonstration | PASS | Application run and demonstrated through manual testing on a physical Android device. |
+| AC-21 | No committed secrets or private configuration | NOT VERIFIED | A final repository-wide secrets/configuration audit is not recorded. |
+| AC-22 | Scanner navigation context and return behavior | PASS | Continue to All Items and back to Home were checked on the physical Android device. |
+| AC-23 | Local Search | PASS | Search and navigation tested on the physical Android device; automated tests recorded. |
+| AC-24 | Orders/Profile remain placeholders | PASS | Placeholder-only behavior covered by automated tests. |
+
+## 8. Remaining Checks Before Submission
+
+The following are remaining checks or limitations, not claims that the completed Android tests were not performed.
+
+- [ ] Run the final verification commands again after documentation and code changes.
+- [ ] Build and, if feasible, install and test the Android release APK.
+- [ ] Record the Android device model, OS version, and test date if evidence is required.
+- [ ] Test invalid QR content on a physical device if time permits.
+- [ ] Verify camera-unavailable behavior on a physical device if a suitable test environment is available.
+- [ ] Review the final repository for accidentally committed secrets or private configuration.
+- [ ] Verify image attribution and license details for the bundled sample images.
+- [ ] Test on iOS if suitable Apple hardware and tooling become available; otherwise, clearly report iOS as untested.
+
+## 9. Final QA Summary
+
+The current record includes passing automated checks from the recorded run, including 28 tests, static analysis, formatting validation, whitespace validation, and a successful Android debug build. The developer also confirmed manual testing on a real Android device, including menu browsing, item details, Search, QR scanning, the successful navigation flow, camera permission grant/denial, UI layout, and airplane-mode behavior.
+
+**Android physical-device testing: completed and developer-reported.**
+
+**iOS testing: not performed.**
+
+A release-build test, repository secrets audit, and separate physical-device tests for invalid QR content and camera-unavailable behavior remain outstanding or unverified.
+
+## 10. PRD Alignment Check
+
+- **PRD update required:** NO.
+- **Reason:** This update records actual QA activity and clarifies verification status; it does not change product scope or requirements.
+- **PRD reapproval required:** NO.
+- **Documentation responsibility:** `QA.md` records test execution and verification status. `PRD.md` remains the approved requirements source; `DESIGN.md` documents the design and requirements traceability; `ARCHITECTURE.md` describes the implementation structure; `POC.md` preserves historical proof-of-concept results; `MVP.md` records implementation milestones; and `REVIEW.md` records the final assessment and outstanding risks.

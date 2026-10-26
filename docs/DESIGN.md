@@ -1,318 +1,462 @@
 # Digital Menu Mobile Design
 
-## 1. Overview and source references
+## 1. Overview and Source References
 
-This document translates the approved product scope into screen-level design guidance for the native Flutter application. The **PRD is the product source of truth**; [ARCHITECTURE.md](./ARCHITECTURE.md) describes the implemented Flutter structure, local data flow, and navigation. The approved ARDO Figma Make design evidence is a visual reference, not proof of implementation.
+This document translates the approved product requirements into screen-level design guidance for the native Flutter application.
+
+- **PRD.md** is the product requirements source of truth.
+- **ARCHITECTURE.md** describes the Flutter structure, local data flow, and navigation.
+- **MCP.md** records the design-tool integration and related evidence.
+- **POC.md** records proof-of-concept experiments and their results.
+- **MVP.md** records the implemented MVP scope, setup, and asset information.
+- **QA.md** records actual test execution and verification results.
+- **REVIEW.md** summarizes the final implementation review, known limitations, and remaining risks.
+
+The approved ARDO Figma Make design is a visual reference. It is not, by itself, evidence that the same design or behavior has been implemented in Flutter.
 
 ### Evidence and limitations
 
-- The Figma Make project is identified by file key `KewPu6ikVpqYgj8hitWJqu`.
-- A user-provided, read-only CSS attachment from the Make project is available as design evidence. It contains ARDO-related styles, typography imports, color tokens, component selectors, scanner/search styles, image URL references, and responsive CSS breakpoints. The values below are transcribed from that attachment, not independently checked against current Figma MCP source.
-- `src/App.tsx`, `src/index.css`, and the actual `public/menu/` files were not available for direct inspection when this document was prepared. The exact component hierarchy, full interaction logic, image inventory, and image licensing/provenance therefore remain unverified.
-- Twelve sample menu photos are now bundled under `assets/images/menu/`; their Commons source and license details are recorded in [MVP.md](./MVP.md). They are not verified ARDO/Figma assets.
-- The current Flutter UI implements the palette, a dark ARDO header, a Search shortcut, circular category icons, and responsive item cards. The exact Figma component structure and original Figma images remain unverified.
+- The Figma Make project was identified in prior project notes by file key `KewPu6ikVpqYgj8hitWJqu`. Its full contents have not been independently verified during this document update.
+- Earlier notes refer to a user-provided, read-only CSS attachment from the Make project. The raw attachment was not available for independent inspection. CSS values, selectors, image URLs, and breakpoints from those notes are therefore historical references.
+- The original prototype files `src/App.tsx`, `src/index.css`, and the complete `public/menu/` image inventory were not available for direct inspection during this update. Exact prototype component structure, original interaction logic, and image provenance remain unverified.
+- Twelve sample menu images are bundled under `assets/images/menu/`. Their source and stated license information are documented in `MVP.md`; current license terms and visual suitability have not been independently verified here.
+- The Flutter implementation uses ARDO-inspired navy, ivory, and gold styling, a branded Home header, category controls, menu cards, Search, bottom navigation, and an in-app QR scanner. This does not establish pixel-perfect equivalence with the original Figma prototype.
+- The user previously reported testing the scanner on a physical device, where the supported menu was recognized and Continue opened the menu. Complete device, operating-system, build, and test-step details were not available for independent verification.
 
-## 2. ARDO visual system
+## 2. ARDO Visual System
 
-The visual direction is a refined restaurant menu: ARDO branding, deep navy surfaces, warm ivory/cream content areas, restrained gold accents, and food photography. Preserve this identity when adapting the prototype to Flutter.
+The intended visual direction is a refined restaurant menu using ARDO branding, deep navy surfaces, warm ivory or cream content areas, restrained gold accents, and food photography.
 
-### Palette evidenced in the supplied CSS attachment
+The Flutter implementation uses a local branding asset in the Home header and as launcher artwork. Its origin and authorship are not established by this document, and it is not verified as an original Figma-provided image.
 
-| Token | Value | Intended use indicated by token/style references |
+### Historical CSS palette reference
+
+The following palette was transcribed in earlier project notes. The raw CSS was not available for independent verification, so these values must not be treated as independently verified Figma evidence.
+
+| Token | Historical value | Intended use |
 |---|---|---|
-| `navy-950` | `#091326` | Deep app/header/scanner background |
+| `navy-950` | `#091326` | Deep background |
 | `navy-900` | `#101d36` | Navigation, cards, and dark controls |
-| `navy-800` | `#1d3764` | Secondary navy surfaces/gradients |
-| `navy-700` | `#284a7d` | Links, prices, and supporting emphasis |
+| `navy-800` | `#1d3764` | Secondary navy surfaces |
+| `navy-700` | `#284a7d` | Links and supporting emphasis |
 | `gold-500` | `#c9a75c` | Accent rules and active indicators |
-| `gold-300` | `#e5cf9d` | Gold highlights on dark surfaces |
+| `gold-300` | `#e5cf9d` | Highlights on dark surfaces |
 | `ivory` | `#f7f3ea` | Main screen background |
 | `paper` | `#fffdf8` | Cards and light surfaces |
 | `ink` | `#172034` | Primary text |
 | `muted` | `#73788a` | Secondary text |
-| `line` | `#e6e0d5` | Light dividers/borders |
-| `error` | `#b44b45` | Error token |
-| `success` | `#3b755d` | Success token |
+| `line` | `#e6e0d5` | Dividers and borders |
+| `error` | `#b44b45` | Error emphasis |
+| `success` | `#3b755d` | Success emphasis |
 
-The CSS also sets a shadow token `0 20px 60px rgba(7, 17, 38, 0.16)`. These are prototype design references; verify final contrast and rendering in Flutter, especially muted text and gold on light backgrounds.
+Earlier notes also mention a CSS shadow reference of `0 20px 60px rgba(7, 17, 38, 0.16)`. This is a historical prototype reference, not a verified Flutter shadow specification.
+
+The Flutter source uses colors including `#101d36`, `#c9a75c`, `#fffdf8`, `#f7f3ea`, `#e5cf9d`, `#e6e0d5`, `#73788a`, `#1d3764`, and `#172034`. The actual source code remains the authority for the current implementation.
+
+Contrast, especially muted text on ivory and gold accents on light backgrounds, should be checked during accessibility review.
 
 ### Typography
 
-The supplied CSS imports:
+Earlier project notes describe the prototype as using:
 
-- **Cormorant Garamond** weights 500, 600, 700 for editorial headings, item names, and brand lettering.
-- **Manrope** weights 400, 500, 600, 700 for body copy, controls, navigation labels, and supporting text.
+- **Cormorant Garamond**, weights 500, 600, and 700, for editorial headings and branding.
+- **Manrope**, weights 400, 500, 600, and 700, for body text and controls.
 
-The font files and their offline availability are not present in project assets. The current Flutter implementation uses the platform system font; it does not claim to bundle Cormorant Garamond or Manrope. Preserve readable system text scaling unless licensed local font files are approved and added.
+The original CSS imports were not available for independent verification. The Flutter project does not bundle local font files for these families and uses the platform system font.
+
+The native app should preserve readable system text scaling. Custom fonts should only be introduced if approved, appropriately licensed files are obtained and added to the Flutter asset configuration.
 
 ### Components, spacing, imagery, and controls
 
-The supplied CSS indicates rounded menu cards, category chips, compact list cards, navy/gold controls, subtle borders/shadows, and a four-destination bottom navigation. Treat those as visual references rather than reusable Flutter components.
+Earlier notes describe rounded cards, category controls, compact item cards, navy and gold controls, subtle borders, and four-destination bottom navigation. These descriptions are historical prototype references rather than independently verified Figma specifications.
 
-Prototype examples include a 20–24 px content inset, 6 px category-chip spacing, 12 px featured-card spacing, rounded card corners around 14–18 px, and a 72 px bottom-navigation surface. These are starting references only; adapt them to Flutter constraints, platform safe areas, and readable touch targets instead of copying fixed sizes indiscriminately.
+The Flutter implementation uses shared spacing and radius constants from `lib/app/design_tokens.dart`, alongside screen-specific styling.
 
-Food photography is central to the visual direction. The CSS references `/menu/duck-breast.jpg` in the Home hero and `/menu/burrata-garden.jpg` in a scanner background. This does **not** confirm that these files exist or are approved item assets. See [Images and assets](#7-images-and-assets).
+The design should prioritize:
 
-## 3. Screen-by-screen specifications
+- Clear visual hierarchy between branding, categories, menu content, and navigation.
+- Consistent spacing and corner treatments.
+- Readable names, descriptions, notes, and prices.
+- Responsive image cropping.
+- Comfortable touch targets.
+- Native safe-area and keyboard behavior.
 
-### Menu Home
+Do not copy fixed prototype dimensions indiscriminately into native Flutter layouts.
 
-**Purpose:** Initial destination; supports the mandatory category-browsing feature.
+## 3. Screen-by-Screen Specifications
+
+### 3.1 Menu Home
+
+**Purpose:** Initial destination and primary entry point for mandatory category browsing.
 
 **Content and behavior**
 
-- ARDO-branded header and menu introduction using the approved dark/light visual system.
-- Horizontally scrollable circular icon controls for the four approved groups: **Drinks, Starters, Mains, Desserts**. A selected control filters the item content directly on Menu Home; do not push a separate category screen.
-- Menu item cards with the item’s image, name, price, and display note where the approved visual layout provides it. Selecting a card opens that item’s Item Details.
-- Tapping the Home Search shortcut selects the Search tab. It does not prefill or automatically focus the search field; the user enters a query separately on Search.
-- A reachable **All Items** action. The current core branch includes a disabled **Scan Menu QR** integration point labelled as unavailable; real scanning belongs to the separate QR feature branch.
-- Bottom navigation visible on this screen: Home, Search, Orders, Profile.
-- Orders/Profile selection shows only the “Not included in this version” notice, with a clear dismissal/return interaction; no business page is opened.
+- Display the ARDO-inspired branded header and menu introduction.
+- Show horizontally scrollable circular category controls for **Drinks, Starters, Mains, and Desserts**.
+- Selecting a category filters items directly on Home. Do not push a separate category screen.
+- Display menu item cards with their images, names, USD prices, and display notes according to the implemented card layout.
+- Selecting a card opens the corresponding Item Details screen.
+- Provide a Search shortcut that selects the Search tab. The user enters a query separately; the shortcut does not automatically prefill or focus the search field.
+- Provide an **All Items** action.
+- Provide an enabled **Scan Menu QR** action that opens the in-app camera scanner.
+- Display the four bottom-navigation destinations: Home, Search, Orders, and Profile.
+- Orders and Profile display only the notice **"Not included in this version"**. They do not open business-feature screens.
+
+**Implemented Flutter layout**
+
+- Home uses a shared 16-logical-pixel horizontal content inset for its principal content.
+- Search and QR controls use 16-pixel corners; menu photos use 12-pixel clipped corners.
+- Vertical spacing uses shared values from `lib/app/design_tokens.dart` and screen-specific layout values.
+- At widths of at least 340 logical pixels with standard text scaling, Home uses a two-column `SliverGrid` with a child aspect ratio of 0.62.
+- At narrower widths or with larger text scaling, the layout uses a `SliverList` so cards can use natural height.
+- Grid cards use constrained text layouts. Names and display notes have two-line limits, while prices must remain readable and must not be ellipsized.
+- List cards use compact images, constrained text, and a price area that can wrap instead of truncating.
+- Widget tests cover specified insets, corner radii, card geometry, price alignment, image bounds, text constraints, and selected narrow or large-text layouts.
+
+These automated checks provide layout evidence under their tested conditions. They do not replace physical-device visual inspection.
 
 **States**
 
-- Normal: initial category/menu view is immediately available from local data.
-- Selected category: chip selection is visibly distinct and the displayed items are filtered.
-- Empty category results are not expected for the approved sample distribution; do not invent such a state unless data validation exposes a real case.
-- No network loading state is required for local menu data.
+- **Initial:** Display the locally bundled categories and menu items.
+- **Selected category:** Visually distinguish the selected category and show its matching items.
+- **Empty category:** Not expected with the approved sample distribution. Do not invent a separate empty-category flow without a real use case.
+- **Loading:** No network loading state is required for local menu data.
+- **Error:** Image failures should not crash the screen; use the existing image fallback.
 
-### Search
+### 3.2 Search
 
-**Purpose:** User-approved additional feature; searches the local menu without a backend.
+**Purpose:** Approved additional feature for searching the local menu without a backend.
 
 **Content and behavior**
 
-- Search field and result count/summary styled consistently with ARDO.
-- Trim surrounding query whitespace and search case-insensitively over each item’s **name, category, description, and display note**.
-- Empty query shows all 12 items. Clearing a query restores all 12 items.
-- Matching results display the existing menu-item presentation; selecting a result opens its correct Item Details.
-- A query with no matches shows an understandable empty-results message. Exact copy should follow verified Figma source if available.
-- Bottom navigation remains visible on Search: Home, Search, Orders, Profile. Orders/Profile retain the notice-only interaction.
-- Do not add advanced filters, remote suggestions, or remote search.
+- Display a search field and matching menu results.
+- Trim surrounding query whitespace and perform case-insensitive matching against each item's name, category name, description, and display note.
+- An empty query returns all 12 items.
+- Clearing the query restores all 12 items.
+- Selecting a result opens the matching Item Details screen.
+- A query with no matches displays a clear empty-results message.
+- Keep Home, Search, Orders, and Profile in the bottom navigation.
+- Orders and Profile retain their notice-only behavior.
+- Do not add remote search, remote suggestions, or unapproved advanced filters.
 
 **States**
 
-- Empty query/all items.
-- Non-empty query with results.
-- No matches/empty results.
-- Query being edited; keyboard visible and content remains usable above it.
-- Clear action restores the all-items state.
-- No asynchronous network loading state is required; show a loading indicator only if a real implementation operation introduces a noticeable delay.
+- Empty query displaying all items.
+- Non-empty query with matching results.
+- Non-empty query with no results.
+- Query editing with the keyboard visible.
+- Cleared query with all items restored.
 
-### All Items
+No asynchronous network loading indicator is required for local search.
 
-**Purpose:** Mandatory dedicated listing of the full menu.
+### 3.3 All Items
+
+**Purpose:** Mandatory dedicated listing of the complete menu.
 
 **Content and behavior**
 
-- Show all 12 items grouped by their four category headings.
-- Display item name and price in the list; retain associated image and display note where the approved card treatment includes them.
-- Selecting any item opens its matching Item Details.
-- Provide a visible back action to the originating browsing context. The bottom tab bar is not required on this pushed screen.
-- Data and imagery are bundled/local; no network loading state.
+- Display all 12 sample menu items grouped under the four category headings.
+- Display the appropriate item information, including name and price, using the implemented card presentation.
+- Selecting an item opens the corresponding Item Details screen.
+- Provide a visible back action.
+- Returning from All Items restores the originating Home route.
+- The bottom-navigation bar is not required on this pushed screen.
+- Data and images are local; no network loading state is required.
 
-### Item Details
+### 3.4 Item Details
 
 **Purpose:** Mandatory item-detail feature.
 
 **Content and behavior**
 
-- Correct selected item’s image, name, nonempty description, USD price, and category association; show the display note as item content when present in the approved data/design.
-- A visible back action returns to the preceding Home, All Items, or Search context.
-- Do not mix details from different item selections.
-- Avoid adding order/cart actions; those features are outside the approved scope.
+- Display the selected item's correct image, name, category, description, display note, and USD price.
+- Ensure information belongs to the selected item and is not mixed with another record.
+- Provide a visible back action returning to the originating Home, All Items, or Search context.
+- Do not add order, cart, account, or payment functionality; these are outside the approved scope.
 
 **States**
 
-- Normal with selected item data.
-- Invalid/missing item reference should follow a clear safe fallback/back path in implementation; exact error presentation is not specified by the PRD and should remain minimal.
-- Local image failure should not crash the screen; the replacement/fallback treatment needs a design decision after the actual image set is known.
+- **Normal:** Display the selected item's data.
+- **Invalid or missing item:** Display the implemented safe not-found message and preserve a safe back-navigation path.
+- **Image unavailable:** Use the existing image fallback without preventing the remaining details from being displayed.
 
-### QR Scanner
+### 3.5 QR Scanner
 
-**Purpose:** Approved additional feature using a real camera in the installed Flutter app.
+**Purpose:** Implemented additional feature that scans a supported QR payload using the installed Flutter app's camera integration.
 
-**Content and behavior**
+**Entry point**
 
-- Open from the Menu Home **Scan Menu QR** action.
-- Use a real Android/iOS camera preview and scanner integration; prototype simulation buttons or decorative-only scanning are not acceptable as production behavior.
-- Recognize only `digital-menu:sample-01`, then return to/open the same locally stored menu without a network request.
-- Pause/guard scan handling after the first valid result to prevent duplicate navigation.
-- Provide an exit/back action to the originating browsing context. Bottom navigation is not required on this pushed screen.
-- The prepared QR is generated outside the app. Scanning it with the phone’s default camera is not an app-launch route.
+The **Scan Menu QR** action on Home opens the in-app camera scanner. The feature uses `mobile_scanner`; it is not a decorative scanning screen or a simulated prototype interaction.
+
+**Scanner presentation**
+
+- Show the live camera preview.
+- Use a centered bracket frame and a shaded overlay outside the frame.
+- Provide a short instruction such as "Place the QR code inside the frame."
+- Keep the frame usable within the available preview area.
+- Provide an exit or back action to return to the originating menu.
+
+**Supported payload and behavior**
+
+The parser accepts only this exact payload:
+
+`digital-menu:sample-01`
+
+- Require three consecutive matching detections, with consecutive detections no more than 700 milliseconds apart.
+- Reject unsupported payloads, including URLs, without opening external links.
+- Stop scanning after stable recognition.
+- Display **Menu recognized** and a **Continue** action.
+- Continue returns a success result to Home, which opens the existing All Items screen over the original Home route.
+- Back from All Items returns to the original Home route.
+- Ignore late scanner callbacks after the scanner screen has been disposed.
+
+The QR feature opens the locally bundled menu. It does not require a backend, a public website, or a remote menu API.
 
 **States**
 
-- Camera permission requested when scanner access is needed.
-- Active camera preview/scanning state.
-- Valid scan: one navigation action to the existing local menu.
-- Invalid QR: understandable error with retry or exit; never open arbitrary links.
-- Camera denied/unavailable: clear explanation and route back to normal browsing without crash.
-- Camera initialization indicator only if startup is perceptibly delayed; local menu screens do not need loading indicators.
+- **Starting:** Show a progress indicator only if camera initialization causes a noticeable delay.
+- **Scanning:** Show the live preview and scanning frame.
+- **Valid QR:** Stop scanning and display the recognition state with Continue.
+- **Invalid QR:** Show understandable retry feedback without opening a URL.
+- **Camera denied or unavailable:** Explain why scanning cannot continue and provide a way back to normal menu browsing.
+- **Exit:** Return to the originating browsing context.
 
-### Orders and Profile notice-only tabs
+Automated tests cover the parser and camera-independent scanner behavior, including stable recognition, navigation, duplicate detections, late callbacks, and relevant error paths. These tests do not prove that native camera permission prompts or physical-camera behavior work on every device.
 
-Orders and Profile remain visible in the bottom navigation on Home and Search. Selecting either displays only **“Not included in this version”** and a clear dismissal/return interaction. They are not separate business screens and must not expose order/profile data, forms, actions, account functionality, or navigation into such flows.
+The user has reported a successful physical-device scan of the supported menu. The available record does not independently establish full Android/iOS compatibility or verification of every permission and error scenario. Refer to `QA.md` for the actual verification record.
 
-## 4. Navigation and interactions
+The prepared QR code is generated outside the app. Scanning it with the phone's default camera is not an app-launch route.
+
+### 3.6 Orders and Profile
+
+Orders and Profile remain visible in the bottom navigation on Home and Search.
+
+Selecting either tab displays only:
+
+**Not included in this version**
+
+Dismissing the notice returns the user to the previous functional tab.
+
+These tabs must not implement order history, profile data, authentication, forms, account actions, or navigation into unapproved business flows.
+
+## 4. Navigation and Interactions
 
 ```text
 App launch
-  └─ Home (bottom navigation visible)
-       ├─ Select category chip → Home remains open; item list filters in place
-       ├─ Select item → Item Details → Back → originating Home
-       ├─ All Items → Back → originating Home
-       │    └─ Select item → Item Details → Back → All Items
-       ├─ Scan Menu QR → Scanner → Back/exit → originating Home
-       │    ├─ valid demo value → same local menu (once only)
-       │    ├─ invalid value → retry or exit
-       │    └─ denied/unavailable camera → exit to normal browsing
-       ├─ Search tab → Search (bottom navigation visible)
-       │    └─ select result → Item Details → Back → Search
-       ├─ Orders tab → “Not included in this version” notice → dismiss → prior tab
-       └─ Profile tab → “Not included in this version” notice → dismiss → prior tab
+└── Home (bottom navigation visible)
+    ├── Select category
+    │   └── Filter Home in place
+    ├── Select item
+    │   └── Item Details
+    │       └── Back to originating Home
+    ├── All Items
+    │   ├── Back to originating Home
+    │   └── Select item
+    │       └── Item Details
+    │           └── Back to All Items
+    ├── Scan Menu QR
+    │   ├── Back/exit to originating Home
+    │   ├── Valid payload
+    │   │   └── Menu recognized
+    │   │       └── Continue
+    │   │           └── Existing All Items route
+    │   │               └── Back to original Home
+    │   ├── Invalid payload
+    │   │   └── Retry or exit
+    │   └── Camera denied/unavailable
+    │       └── Return to normal browsing
+    ├── Search tab
+    │   ├── Search local items
+    │   └── Select result
+    │       └── Item Details
+    │           └── Back to Search
+    ├── Orders tab
+    │   └── Notice → dismiss → previous functional tab
+    └── Profile tab
+        └── Notice → dismiss → previous functional tab
 ```
 
-Home and Search retain the bottom navigation. All Items, Item Details, and QR Scanner are pushed experiences with an appropriate back/exit action; do not require the tab bar on them. Preserve originating browsing context when returning. Orders/Profile are notice interactions, not routes to functional pages.
+Home and Search retain the bottom navigation. All Items, Item Details, and the QR Scanner are pushed experiences with appropriate back or exit behavior. The original browsing context should be preserved.
 
-## 5. Responsive Android/iOS design
+Orders and Profile are notice interactions, not functional business routes.
 
-The Figma Make design is a web prototype; its CSS includes a centered mobile shell capped around 390 px, a minimum screen height of 844 px, fixed-height visual regions, and breakpoints around 420 px and 365 px. These constraints are not the Flutter layout specification. The Flutter Home grid uses two columns from 340 logical pixels when text scaling is standard and switches to one column for larger text or narrower widths. A widget test exercises 360 logical pixels and larger text; physical-device behavior remains unverified.
+## 5. Responsive Android/iOS Design
+
+Earlier notes describe a Figma Make prototype with a centered mobile shell, fixed-height visual regions, and breakpoints around 420 and 365 pixels. The raw CSS was not available for verification. These values are historical prototype references, not the Flutter layout specification.
+
+The current Home layout uses a two-column grid from 340 logical pixels under standard text scaling and switches to a list for narrower widths or larger text scaling.
 
 For native Flutter:
 
 - Use available screen constraints and flexible layouts rather than a fixed 390 × 844 viewport.
-- Respect Android and iOS safe areas, system bars, and bottom insets. Keep bottom navigation clear of system gesture areas.
-- On narrow phones, allow horizontal category-chip scrolling, wrap long labels/content, and avoid card/detail overflow. Reflow content rather than shrinking text below comfortable readability.
-- On wider phones, retain a phone-oriented reading width and use deliberate margins; avoid stretching text and card content across the full width.
-- Make long Home, Search, All Items, and Detail content vertically scrollable. Keep controls reachable when content scrolls.
-- Handle Search keyboard insets so the field/results remain visible and the keyboard does not cover the active result/content.
-- Support larger system text scaling, multiline names/descriptions, and price layouts without clipping or overlap.
-- In landscape where practical, preserve usable scanner framing and scrollable menu/detail content; do not assume a portrait-only fixed height.
-- Keep image crops intentional across aspect ratios, using the approved source image and a consistent fit/crop treatment.
-- Verify layouts on narrow and wider Android/iOS phone configurations. PRD specifically calls for a narrow layout around 360 logical pixels, safe areas, larger text, and physical Android device testing.
+- Respect Android and iOS safe areas, system bars, and bottom insets.
+- Keep bottom navigation clear of system gesture areas.
+- Allow horizontal scrolling for category controls on narrow screens.
+- Prevent long labels, descriptions, and prices from overflowing or being clipped.
+- Reflow content instead of reducing text below a comfortable readable size.
+- Keep Home, Search, All Items, and Item Details content vertically scrollable when necessary.
+- Ensure the Search field and results remain usable while the keyboard is visible.
+- Support larger system text scaling and multiline content.
+- Keep image crops appropriate to the card's available aspect ratio.
+- Preserve a usable scanner frame in the available camera preview.
+- Review portrait and landscape layouts where practical.
 
-These are implementation/design requirements, not claims that responsive behavior has already been tested. Native iOS build/runtime verification remains unconfirmed until actually exercised in an Apple environment.
+**Future improvement, not currently implemented:** Wider phones could benefit from a deliberate maximum content width and larger outer margins. The current Home layout does not enforce a maximum content-width constraint.
+
+Widget tests cover selected narrow and larger-text layouts. These tests do not establish full physical-device compatibility.
+
+The PRD's responsive acceptance criteria, including narrow phone layouts, safe areas, text scaling, and Android device testing, must be verified through the QA process. Native iOS build/runtime verification requires a compatible Apple development environment and remains unverified.
 
 ## 6. Accessibility
 
-- Use readable text sizes and preserve Flutter system text scaling; avoid hard-coded prototype font sizes that prevent enlargement.
-- Ensure sufficient foreground/background contrast, especially muted text on ivory and gold accents on light surfaces.
-- Provide semantic labels for category chips, item cards, prices, navigation destinations, search clear action, back/exit controls, and scanner state/actions.
-- Communicate selected category and selected navigation destination programmatically and visually, not by color alone.
-- Ensure interactive targets are comfortably tappable and do not rely on tiny icon-only affordances without labels/semantics.
-- Maintain logical screen-reader reading order and meaningful image descriptions for menu photography; decorative images should not create redundant announcements.
-- Give Search results, no-results, camera permission, camera unavailable, and invalid QR feedback understandable text.
-- Check keyboard focus/activation for interactive controls where supported by the native platform, as well as larger text and safe-area behavior.
+The following are design and implementation requirements, not claims that accessibility acceptance testing is complete.
 
-The PRD does not specify a formal WCAG conformance level; none is claimed here.
+- Preserve readable text and Flutter's system text scaling.
+- Check foreground/background contrast, particularly muted text on ivory and gold accents on light backgrounds.
+- Provide meaningful semantic labels for category controls, item cards, navigation destinations, search actions, and scanner controls.
+- Expose the selected category and selected navigation destination both visually and programmatically.
+- Ensure touch targets are comfortably tappable.
+- Avoid unlabeled icon-only controls.
+- Maintain logical screen-reader reading order.
+- Provide meaningful image descriptions for menu photography and avoid redundant announcements for decorative imagery.
+- Make Search empty-results, invalid QR, camera permission, and camera unavailable messages understandable.
+- Verify keyboard focus and activation behavior where supported.
+- Test larger text, safe areas, and screen-reader behavior on supported devices.
 
-## 7. Images and assets
+Widget tests and the presence of semantic labels do not establish contrast compliance or complete screen-reader accessibility. The PRD does not specify a formal WCAG conformance level; this document does not claim one.
+
+## 7. Images and Assets
 
 ### Confirmed local project assets
 
-Twelve local JPEG sample photos are bundled under `assets/images/menu/` and declared in `pubspec.yaml`. The file names correspond to the 12 sample item records; all 12 files are checked by a repository test and were visually reviewed for broad item correspondence. Provenance and license links are recorded in [MVP.md](./MVP.md). They are sample assets, not verified ARDO/Figma photography. On-device crop/rendering and offline loading remain unverified.
+Twelve sample JPEG photos are bundled under `assets/images/menu/` and registered in `pubspec.yaml`.
 
-### References visible in supplied CSS (not verified files)
+Menu item records reference local image paths, and repository tests check that referenced files exist. File-existence tests do not verify visual suitability, licensing, or whether every photo accurately represents its associated menu item.
 
-| Prototype reference | CSS use | Verification status |
+Source and stated license information are recorded in `MVP.md`. Current license terms and visual correspondence have not been independently verified in this update.
+
+These are sample assets, not verified original ARDO/Figma photographs.
+
+### Historical CSS URL references
+
+Earlier project notes mention these prototype URLs:
+
+| Prototype reference | Previously described use | Verification status |
 |---|---|---|
-| `/menu/duck-breast.jpg` | Home hero background | URL observed in provided CSS attachment; actual file, rights, and menu-item mapping unverified |
-| `/menu/burrata-garden.jpg` | Scanner background | URL observed in provided CSS attachment; actual file, rights, and menu-item mapping unverified |
+| `/menu/duck-breast.jpg` | Home hero background | Original CSS and actual file not independently verified |
+| `/menu/burrata-garden.jpg` | Scanner background | Original CSS and actual file not independently verified |
 
-Do not assume these two references are the full set or correct final item images. Obtain the actual approved `public/menu/` files and confirm their provenance and mapping before implementation.
+Do not assume that these references are the complete asset inventory or that the files exist in the current Flutter project. Obtain the original assets and confirm their source, rights, and intended use before treating them as approved design evidence.
 
 ### Implementation asset requirements
 
-- Menu photos are stored under `assets/images/menu/`; each item has a required local path and the directory is registered in `pubspec.yaml`.
-- Repository tests verify every referenced file exists. Flutter asset bundling is configured, but a release APK build is still required to verify packaging.
-- Attribution, source links, and licenses are recorded in [MVP.md](./MVP.md). These files must not be described as ARDO/Figma assets.
-- `MenuItemImage` uses a semantic label and a visual fallback. Runtime image loading and crop behavior still need device verification.
-- No local Cormorant Garamond or Manrope font files are present; the app uses system fonts.
+- Keep menu photos under `assets/images/menu/`.
+- Ensure each menu item's image path points to a real bundled file.
+- Keep asset registration in `pubspec.yaml` aligned with the project structure.
+- Preserve source and license information in `MVP.md`.
+- Use the existing image widget's fallback to prevent missing images from breaking the screen.
+- Verify image rendering, cropping, and release packaging through actual build and device checks.
+- Do not claim that sample photos are original ARDO/Figma assets without evidence.
+- Do not claim that Cormorant Garamond or Manrope are bundled fonts; the current app uses the platform system font.
 
-## 8. Empty, loading, unavailable, and error states
+## 8. Empty, Loading, Unavailable, and Error States
 
-| Context | Required design behavior |
+| Context | Required behavior |
 |---|---|
-| Local menu startup | Menu is available immediately; no network loading state. |
-| Search empty query | Display all 12 items. |
-| Search no matches | Explain that no matching menu items were found; keep query editable/clearable. |
-| Search clear | Restore all 12 items. |
-| Empty category | Not expected with the approved sample data; do not invent a special page absent a real empty dataset case. |
-| Item image unavailable | Prevent crash and preserve legible item details; choose a minimal fallback after the approved asset inventory is available. |
-| Missing/invalid detail item | Provide a safe return to prior browsing; exact copy is an implementation decision. |
-| Scanner starting | Show an indicator only if camera initialization causes a noticeable delay. |
-| Camera permission denied/unavailable | Explain scanner cannot proceed and provide exit/back to normal menu. |
-| Unsupported QR value | Explain unsupported code and allow retry or exit; never redirect. |
-| Valid QR | Open the same local menu exactly once. |
-| Orders/Profile selected | Show only “Not included in this version”; dismissal returns to prior tab. |
+| Local menu startup | Display the bundled menu without a network loading state. |
+| Search with empty query | Show all 12 items. |
+| Search with no matches | Explain that no matching items were found and allow the query to be edited or cleared. |
+| Search clear action | Restore all 12 items. |
+| Empty category | Not expected with the approved sample distribution; do not invent a special flow without a real use case. |
+| Item image unavailable | Preserve readable item details and use the image fallback. |
+| Invalid item reference | Display the implemented safe not-found message and preserve a back-navigation path. |
+| Scanner starting | Show a progress indicator only if initialization causes a noticeable delay. |
+| Camera permission denied | Explain that scanning cannot proceed and provide a route back to browsing. |
+| Camera unavailable | Explain the issue and allow the user to return to the menu. |
+| Unsupported QR payload | Provide retry feedback; never redirect to an arbitrary URL. |
+| Valid QR payload | Stop scanning after stable recognition, display Menu recognized, and offer Continue to open All Items. |
+| Orders/Profile selected | Show only the notice that the feature is not included in this version. |
 
-## 9. Requirements traceability
+These are the intended design behaviors. Actual verification status belongs in `QA.md`.
 
-Architecture paths refer to the current structure described in [ARCHITECTURE.md](./ARCHITECTURE.md). This matrix records design coverage, not proof that every criterion passed testing.
+## 9. Requirements Traceability
+
+This matrix links the PRD requirements to the intended design and relevant implementation components. It is a coverage map, not proof that every requirement has passed testing.
+
+The FS and AC identifiers below should be retained only where they match the identifiers in the approved `PRD.md`. The PRD remains authoritative if any identifier or wording differs.
 
 ### Functional scenarios
 
-| PRD requirement | Design coverage | Architecture component |
+| Requirement | Design coverage | Relevant implementation |
 |---|---|---|
-| FS-01 — View categories | Menu Home initially shows four recognizable circular category controls and items. | `menu_home_screen.dart`, `menu_repository.dart` |
-| FS-02 — Browse category | Selecting a category control filters Home in place. | `menu_home_screen.dart`, `menu_repository.dart` |
-| FS-03 — Browse all | All Items displays all 12 records grouped by category. | `all_items_screen.dart`, `menu_repository.dart` |
-| FS-04 — Inspect item | Item Details shows the selected image, category, name, description, note, and price. | `menu_item_card.dart`, `menu_item_image.dart`, `item_detail_screen.dart` |
-| FS-05 — Return to browsing | Back from details returns to the originating Home, All Items, or Search context. | `item_detail_screen.dart`, `app/app.dart` |
-| FS-06 — Valid QR | Planned separate-branch scanner validates the fixed value and opens the same local menu once. | Not implemented on core branch |
-| FS-07 — Invalid QR | Planned clear unsupported-code state with retry or exit; no redirect. | Not implemented on core branch |
-| FS-08 — No camera access | Planned permission-denial/unavailability handling. | Not implemented on core branch |
-| FS-09 — Search local menu (approved addition) | Trim, case-insensitive matching on name/category/description/note; all items for empty/cleared query; empty-results state; select result for details. | `search_screen.dart`, `menu_repository.dart`, `menu_item.dart`, `item_detail_screen.dart` |
-| FS-10 — Orders/Profile notice (approved addition) | Visible tabs on Home/Search; selection shows notice only; dismiss returns to prior tab. | `app/app.dart` |
+| FS-01 — View categories | Home displays the four category controls and menu items. | `menu_home_screen.dart`, `menu_repository.dart` |
+| FS-02 — Browse category | Selecting a category filters Home in place. | `menu_home_screen.dart`, `menu_repository.dart` |
+| FS-03 — Browse all | All Items displays the 12 records grouped by category. | `all_items_screen.dart`, `menu_repository.dart` |
+| FS-04 — Inspect item | Details display the selected image, category, name, description, note, and price. | `item_detail_screen.dart`, `menu_item_image.dart` |
+| FS-05 — Return to browsing | Back returns to the originating Home, All Items, or Search context. | `item_detail_screen.dart`, `app.dart` |
+| FS-06 — Valid QR | The supported payload is recognized after stable detections; Continue opens All Items. Full camera/platform compatibility remains unverified. | `qr_payload_parser.dart`, `qr_scanner_screen.dart`, `menu_home_screen.dart` |
+| FS-07 — Invalid QR | Unsupported payloads do not open links and provide retry feedback. | `qr_payload_parser.dart`, `qr_scanner_screen.dart` |
+| FS-08 — Camera unavailable or denied | Provide an explanation and a way back to menu browsing. Automated UI coverage does not prove native permission behavior. | `qr_scanner_screen.dart`, Android and iOS permission configuration |
+| FS-09 — Local Search, approved addition | Match name, category, description, and note; support empty, clear, no-match, and result-to-details behavior. | `search_screen.dart`, `menu_repository.dart` |
+| FS-10 — Orders/Profile, approved addition | Visible tabs show the notice only and do not implement business features. | `app.dart` |
 
 ### Acceptance criteria
 
-| PRD criterion | Design coverage / non-UI verification | Architecture component |
+The following is the design-side coverage map for the acceptance criteria referenced in the current design notes. Confirm the exact identifiers and wording against the approved PRD before treating this as a definitive one-to-one mapping.
+
+| Criterion | Design coverage or verification requirement | Relevant implementation |
 |---|---|---|
-| AC-01 | Menu Home initial layout is clean and usable. | `menu_home_screen.dart`, `app/app.dart` |
-| AC-02 | Readable food/drink category labels. | `menu_home_screen.dart` |
-| AC-03 | Home category controls filter the correct items in place. | `menu_home_screen.dart`, `menu_repository.dart` |
-| AC-04 | All Items is reachable and presents all 12 items/four categories. | `all_items_screen.dart`, `menu_repository.dart` |
-| AC-05 | Each detail displays correct name, nonempty description, USD price, and image. | `item_detail_screen.dart`, `menu_item.dart` |
-| AC-06 | At least two item selections show their own matching details. | `menu_item_card.dart`, `item_detail_screen.dart` |
-| AC-07 | Visible details back action returns to browsing. | `item_detail_screen.dart`, `app/app.dart` |
-| AC-08 | Local data/assets support offline menu, details, and images; requires implementation/device verification, not design alone. | `sample_menu_data.dart`, `menu_repository.dart`, asset bundle |
-| AC-09 | Narrow (~360 logical px) and wider phone, text scaling, safe areas, no overflow; requires layout/device QA. | `app/app.dart`, `menu_home_screen.dart`, and other screens |
-| AC-10 | Orders/Profile tab interaction is notice-only; no business screens. | `app/app.dart` |
-| AC-11 | Visible controls have real specified interactions; implementation verification required. | All interactive screens/widgets |
-| AC-12 | Android release build/install and physical-device core flow; build/device QA, not UI design. | Whole app; test record in `docs/QA.md` |
-| AC-13 | Android/iOS Flutter targets; native iOS verified only after actual Apple-environment build/runtime test. | Flutter platform projects; device QA |
-| AC-14 | Scan action is a disabled integration point; a real camera scanner is pending the QR branch. | `menu_home_screen.dart`; scanner not implemented |
-| AC-15 | Valid scan behavior is pending. | Scanner not implemented |
-| AC-16 | Invalid QR behavior is pending. | Scanner not implemented |
-| AC-17 | Camera permission/unavailable behavior is pending. | Scanner not implemented |
-| AC-18 | Duplicate-result handling is pending. | Scanner not implemented |
-| AC-19 | Runnable source/setup/essential docs; delivery/documentation criterion, not UI design. | Repository and README |
-| AC-20 | Local device demonstration without public deployment; demonstration criterion requiring actual device run. | Whole app; QA record |
-| AC-21 | No secrets/private machine configuration; repository/security hygiene criterion, not UI design. | Repository review |
-| AC-22 | Four bottom tabs visible on Home/Search; pushed screens return by back/exit without requiring tabs. | `app/app.dart`, `menu_home_screen.dart`, `all_items_screen.dart`, `item_detail_screen.dart` |
-| AC-23 | Search matching/empty/clear/result-to-detail behavior; implementation and widget verification required. | `search_screen.dart`, `menu_repository.dart`, `item_detail_screen.dart` |
-| AC-24 | Orders/Profile show only informational notice; no business behavior. | `app/app.dart` |
+| AC-01 | Home presents the menu in a clear, usable layout. | `menu_home_screen.dart`, `app.dart` |
+| AC-02 | Category labels are recognizable and readable. | `menu_home_screen.dart` |
+| AC-03 | Category selection filters the correct items in place. | `menu_home_screen.dart`, `menu_repository.dart` |
+| AC-04 | All Items is reachable and presents the complete menu. | `all_items_screen.dart`, `menu_repository.dart` |
+| AC-05 | Item Details displays the correct name, description, USD price, and image. | `item_detail_screen.dart`, `menu_item.dart` |
+| AC-06 | Multiple item selections display their respective details. | `menu_item_card.dart`, `item_detail_screen.dart` |
+| AC-07 | Back navigation returns to the originating browsing context. | `item_detail_screen.dart`, `app.dart` |
+| AC-08 | Menu data and images are bundled for offline use; device behavior requires verification. | `sample_menu_data.dart`, `menu_repository.dart`, bundled assets |
+| AC-09 | Narrow and wider layouts, text scaling, safe areas, and overflow are addressed. | Relevant screens and layout widgets; device QA required |
+| AC-10 | Orders/Profile remain notice-only. | `app.dart` |
+| AC-11 | Visible controls perform their specified interactions. | Relevant screens and widgets |
+| AC-12 | Android release build, installation, and core physical-device flow are verified through QA. | Whole app; `QA.md` |
+| AC-13 | Android/iOS targets are present; native iOS compatibility requires a real Apple-environment build/runtime check. | Flutter platform projects; `QA.md` |
+| AC-14 | Home opens the in-app camera scanner. | `menu_home_screen.dart`, `qr_scanner_screen.dart` |
+| AC-15 | A valid payload produces recognition and Continue opens All Items. | `qr_payload_parser.dart`, `qr_scanner_screen.dart`, `all_items_screen.dart` |
+| AC-16 | Unsupported QR data produces retry feedback and no external navigation. | `qr_payload_parser.dart`, `qr_scanner_screen.dart` |
+| AC-17 | Permission-denied/unavailable UI provides a safe way back to browsing. | `qr_scanner_screen.dart`, Android and iOS permission configuration |
+| AC-18 | Stable detections result in one recognition/navigation transition. | `qr_scanner_screen.dart`, widget tests |
+| AC-19 | Runnable source, setup instructions, and essential documentation are provided. | Repository and `README.md` |
+| AC-20 | A local device demonstration can be performed without public deployment. | Whole app; demonstration evidence in QA/review records |
+| AC-21 | No secrets or private machine configuration are committed. | Repository review |
+| AC-22 | Four tabs remain visible on Home/Search; pushed screens use back/exit navigation. | `app.dart` and relevant screens |
+| AC-23 | Search matching, empty query, clear, no-match, and result-to-details behavior are implemented. | `search_screen.dart`, `menu_repository.dart`, `item_detail_screen.dart` |
+| AC-24 | Orders/Profile display only the informational notice. | `app.dart` |
 
-## 10. Open implementation questions and verifiable design decisions
+Do not mark a criterion as passed solely because it appears in this matrix. Use `QA.md` for evidence and actual test results.
 
-### Decisions fixed by PRD/architecture
+## 10. Open Design Questions and Verification
 
-- Home category controls filter directly on Menu Home; no separate Category screen.
-- Search rules are fixed: trim query, case-insensitive match on name/category/description/display note; empty/cleared query returns all 12; no-match state; result opens correct detail.
-- Bottom navigation is visible on Home and Search. All Items, Item Details, and QR Scanner use appropriate back/exit navigation.
-- Orders/Profile tabs show only “Not included in this version.”
-- The app uses local data and bundled menu assets. The current core branch has a disabled Scan Menu QR control; the real scanner using the single accepted demo value is pending.
-- Flutter native widgets/styles are used for implementation; Tailwind is not used in Flutter.
+### Decisions established by the approved scope and implementation
+
+- Home category controls filter the existing Home screen; there is no separate category route.
+- Search trims the query and performs case-insensitive local matching on item name, category, description, and display note.
+- An empty or cleared query returns all 12 items.
+- Search results open the corresponding Item Details screen.
+- Home and Search retain the four-destination bottom navigation.
+- All Items, Item Details, and the QR Scanner use appropriate back/exit navigation.
+- Orders and Profile display only the notice stating that they are not included in this version.
+- Menu data and images are bundled locally. No menu backend or network API is implemented.
+- The scanner accepts only `digital-menu:sample-01` and does not open arbitrary URLs.
+- Flutter native widgets and styling are used; Tailwind CSS is not part of the mobile app.
 
 ### Remaining design and implementation verification
 
-1. Obtain the actual Figma Make `src/App.tsx`, `src/index.css`, and `public/menu/` assets to verify exact content copy, component structure, all screen interactions, and full image inventory.
-2. Figma image URLs remain unverified. The local Commons sample assets and their sources/licenses are recorded in [MVP.md](./MVP.md); they are not the referenced ARDO assets.
-3. Cormorant Garamond and Manrope files are absent; the current app uses the platform system font.
-4. Search implementation and behavior are covered by repository/widget tests. Offline use still needs physical-device verification.
-5. Select a maintained Android/iOS scanner package on the QR feature branch and verify its permission requirements on both platforms.
-6. Physical Android device testing is blocked because no Android device/emulator is connected to the current environment. iOS native build/runtime testing requires macOS/Xcode and is not verified.
+1. Obtain the original Figma Make source files and asset inventory if exact visual comparison is required.
+2. Confirm the provenance, intended mapping, and current license terms of bundled menu images.
+3. Preserve the existing system-font behavior unless approved local font files are added.
+4. Run the automated tests against the final committed code and record their actual results in `QA.md`.
+5. Verify offline behavior and image rendering on a physical Android device.
+6. Verify scanner operation and permission-denial/unavailable-camera behavior on the intended Android device.
+7. Verify iOS build and runtime behavior in a compatible macOS/Xcode environment.
+8. Review keyboard insets, larger text, safe areas, and accessibility behavior on supported devices.
 
-No conflict with the approved PRD or architecture is introduced by this design specification. The main implementation correction is to adapt the web prototype’s fixed dimensions and CSS behavior to responsive native Flutter layouts while retaining the approved visual identity.
+This design document describes the intended UI and the current implementation approach. It does not claim complete pixel-level Figma parity, full iOS verification, or successful execution of untested device scenarios.
